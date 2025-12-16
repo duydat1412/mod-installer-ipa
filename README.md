@@ -24,9 +24,8 @@ Resources/
 
 - Thiết bị có quyền truy cập sâu vào file game:
   - Ưu tiên: **TrollStore** hoặc máy đã **jailbreak**
-  - Hoặc: iOS 17–18 dùng **AltStore / Sideloadly** để sideload `.ipa` (Apple ID free chỉ có hạn 7 ngày)
 
-> ❌ **Không khuyến nghị** dùng eSign / các ứng dụng “ký IPA” bên thứ ba.  
+> ❌ **Không khuyến nghị** dùng eSign, altserver,..CHỈ DÙNG TROLLSTORE / các ứng dụng “ký IPA” bên thứ ba.  
 > Dễ bị revoke chứng chỉ, và bạn không kiểm soát được việc họ chỉnh sửa IPA/chèn mã độc.
 
 ---
