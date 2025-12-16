@@ -13,10 +13,8 @@ struct ContentView: View {
                 // Status
                 statusSection
                 
-                // Mod List
-                if !viewModel.modPacks.isEmpty {
-                    modListSection
-                }
+                // Mod List - ✅ FIXED: Luôn hiển thị section này
+                modListSection
                 
                 // Actions
                 Spacer()
@@ -105,7 +103,7 @@ struct ContentView: View {
             Text(viewModel.statusMessage)
                 .font(.caption)
                 .foregroundColor(.secondary)
-                .lineLimit(2)
+                .lineLimit(3)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
@@ -113,21 +111,45 @@ struct ContentView: View {
         .cornerRadius(10)
     }
     
+    // ✅ FIXED: Luôn hiển thị mod list section
     private var modListSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Mod Packs (\(viewModel.modPacks.count))")
                 .font(.headline)
             
-            ScrollView {
-                ForEach(viewModel.modPacks) { mod in
-                    ModPackRow(
-                        modPack: mod,
-                        isSelected: viewModel.selectedModPack?.id == mod.id
-                    )
-                    .onTapGesture {
-                        viewModel.selectedModPack = mod
+            if viewModel.modPacks.isEmpty {
+                // Empty state
+                VStack(spacing: 8) {
+                    Image(systemName: "archivebox")
+                        .font(.system(size: 40))
+                        .foregroundColor(.gray)
+                    Text("Chưa có mod pack")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("Nhấn 'Thêm Mod Pack' để import")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.secondary.opacity(0.05))
+                .cornerRadius(10)
+            } else {
+                // ✅ Mod pack cards
+                ScrollView {
+                    ForEach(viewModel.modPacks) { mod in
+                        ModPackRow(
+                            modPack: mod,
+                            isSelected: viewModel.selectedModPack?.id == mod.id
+                        )
+                        .onTapGesture {
+                            withAnimation {
+                                viewModel.selectedModPack = mod
+                            }
+                        }
                     }
                 }
+                .frame(maxHeight: 200)
             }
         }
     }
@@ -159,16 +181,24 @@ struct ContentView: View {
             }
             .disabled(!viewModel.gameFound)
             
-            // Install
+            // Install - ✅ FIXED: Hiển thị rõ trạng thái
             Button(action: {
                 viewModel.installSelectedMod()
             }) {
-                Label("Cài Đặt Mod", systemImage: "arrow.down.circle.fill")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(viewModel.selectedModPack != nil ? Color.green : Color.gray)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
+                HStack {
+                    if viewModel.selectedModPack == nil {
+                        Image(systemName: "hand.tap.fill")
+                        Text("Chọn mod pack để cài")
+                    } else {
+                        Image(systemName: "arrow.down.circle.fill")
+                        Text("Cài Đặt Mod")
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(viewModel.selectedModPack != nil ? Color.green : Color.gray)
+                .foregroundColor(.white)
+                .cornerRadius(10)
             }
             .disabled(viewModel.selectedModPack == nil || !viewModel.gameFound || viewModel.isInstalling)
             
@@ -294,11 +324,20 @@ struct ModPackRow: View {
             if isSelected {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.green)
+                    .font(.title2)
+            } else {
+                Image(systemName: "circle")
+                    .foregroundColor(.gray)
+                    .font(.title2)
             }
         }
         .padding()
         .background(isSelected ? Color.blue.opacity(0.1) : Color.secondary.opacity(0.05))
         .cornerRadius(10)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+        )
     }
 }
 
