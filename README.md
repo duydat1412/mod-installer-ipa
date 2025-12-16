@@ -1,27 +1,30 @@
-# 📱 Liên Quân Mobile - Mod Installer
+# 📱 Arena of Valor - Mod Installer
 
-iOS app tự động cài đặt skin mods cho Liên Quân Mobile.
+Automated iOS app for installing skin mods for Arena of Valor (Liên Quân Mobile).
+
+**⚠️ Educational purposes only. Use at your own risk.**
 
 ---
 
 ## ✨ Features
 
-- ✅ Tự động tìm game directory
-- ✅ Scan và import mod packs
-- ✅ Backup files gốc trước khi install
-- ✅ Auto mapping files theo cấu trúc đã phân tích
-- ✅ Progress tracking real-time
-- ✅ Restore backup dễ dàng
-- ✅ SwiftUI modern interface
+- ✅ Automatic game directory detection
+- ✅ Scan and import mod packs
+- ✅ Backup original files before installation
+- ✅ Auto file mapping (6 folders, 100+ files)
+- ✅ Real-time progress tracking
+- ✅ Easy backup restoration
+- ✅ Modern SwiftUI interface
+- ✅ Filza-like root access via entitlements
 
 ---
 
-## 📋 Yêu Cầu
+## 📋 Requirements
 
-- iPhone Jailbroken (Filza installed)
+- **TrollStore** or Jailbroken iPhone (recommended)
 - iOS 14.0+
-- Liên Quân Mobile đã cài đặt và chạy ít nhất 1 lần
-- Mod pack với cấu trúc:
+- Arena of Valor installed from App Store (run at least once)
+- Mod pack with structure:
   ```
   ModPack/
   └── 1.60.1/
@@ -35,67 +38,89 @@ iOS app tự động cài đặt skin mods cho Liên Quân Mobile.
 
 ---
 
-## 🚀 Cách Sử Dụng
+## 🚀 Installation
 
-### 1. Build App
+### Method 1: GitHub Actions (Recommended - No macOS needed!)
 
-**Trong Xcode:**
+1. **Download IPA:**
+   - Go to [Actions](../../actions)
+   - Click latest workflow run
+   - Scroll to "Artifacts"
+   - Download `ModInstaller-IPA`
+   - Extract ZIP
+
+2. **Install via TrollStore:**
+   ```
+   1. Transfer IPA to iPhone (AirDrop/Files)
+   2. Open TrollStore
+   3. Tap "+" → Select IPA
+   4. Install
+   ```
+
+3. **Install via Sideloadly (alternative):**
+   ```
+   1. Open Sideloadly on PC
+   2. Drag IPA file
+   3. Connect iPhone → Sign & install
+   ```
+
+### Method 2: Build from source (Requires macOS)
+
 ```bash
-1. Open project: ModInstaller.xcodeproj
-2. Select target: iPhone (your device)
-3. Sign with Apple Developer account
-4. Build & Run (Cmd+R)
+git clone https://github.com/duydat1412/mod-installer-ipa.git
+cd mod-installer-ipa/ModInstaller
+xcodegen generate
+xcodebuild -project ModInstaller.xcodeproj -scheme ModInstaller
 ```
 
-**Sideload (không cần Xcode):**
-```bash
-1. Export IPA từ Xcode: Product → Archive → Export
-2. Sideload qua Sideloadly / AltStore
-3. Trust certificate: Settings → General → VPN & Device Management
-```
+---
 
-### 2. Import Mod Pack
+## 📖 Usage
+
+### 1. Import Mod Pack
 
 ```
-1. Copy mod pack folder vào iPhone qua:
+1. Transfer mod pack folder to iPhone via:
    - Filza File Manager
    - iMazing / iFunBox
    - iTunes File Sharing
 
-2. Trong app, tap "Thêm Mod Pack"
+2. Open ModInstaller app
 
-3. Browse đến folder mod pack
+3. Tap "Add Mod Pack"
+
+4. Browse to mod folder
 ```
 
-### 3. Cài Đặt Mod
+### 2. Install Mod
 
 ```
-1. Tap "Tạo Backup" (chỉ cần 1 lần)
-   → Backup files gốc để restore sau này
+1. Tap "Create Backup" (one time only)
+   → Backs up original files for restoration
 
-2. Chọn mod pack từ danh sách
+2. Select mod pack from list
 
-3. Tap "Cài Đặt Mod"
-   → App sẽ tự động copy files
+3. Tap "Install Mod"
+   → App automatically copies 100+ files
 
-4. Chờ progress bar hoàn tất
+4. Wait for progress bar to complete (~30 seconds)
 
-5. Restart Liên Quân Mobile
+5. Restart Arena of Valor
 ```
 
-### 4. Restore Files Gốc
+### 3. Restore Original Files
 
 ```
 1. Tap "Restore Backup"
 
 2. Restart game
 
-→ Game trở về trạng thái ban đầu
+→ Game returns to vanilla state
 ```
 
 ---
 
-## 🛠️ Cấu Trúc Project
+## 🛠️ Project Structure
 
 ```
 ModInstaller/
@@ -127,55 +152,81 @@ App tự động map files theo cấu trúc:
 | Ages/Prefab_Characters/Prefab_Hero/ | Ages/... | ❌ |
 | Languages/VN_Garena_VN/ | Languages/... | ❌ |
 
-**Path gốc:** `/var/mobile/Containers/Data/Application/[UUID]/Documents/Resources/1.60.1/`
+**Base Path:** `/var/mobile/Containers/Data/Application/[UUID]/Documents/Resources/1.60.1/`
 
 ---
 
-## ⚠️ Lưu Ý
+## 🔐 How It Works
 
-### An Toàn:
-- ✅ **LUÔN** tạo backup trước khi install mod
-- ✅ Test trên alt account trước
-- ✅ Không share IPA có mod publicly
+### Entitlements (Filza-like access):
+
+The app uses **private entitlements** to bypass iOS sandbox:
+
+```xml
+<key>platform-application</key>
+<key>com.apple.private.security.no-container</key>
+<key>com.apple.private.security.container-manager</key>
+```
+
+These entitlements allow:
+- ✅ Root file system access
+- ✅ Access to all app containers
+- ✅ Read/write game files like Filza
+
+**Note:** Requires TrollStore or jailbreak to activate entitlements.
+
+---
+
+## ⚠️ Important Notes
+
+### Safety:
+- ✅ **ALWAYS** create backup before installing mods
+- ✅ Test on alt account first
+- ✅ Don't share modded IPA publicly
 
 ### Troubleshooting:
 
-**"Không tìm thấy game"**
+**"Game not found"**
 ```
-→ Chạy Liên Quân ít nhất 1 lần để game tải resources
-→ Check trong Filza: /var/mobile/Containers/Data/Application/
-```
-
-**"Mod pack không hợp lệ"**
-```
-→ Kiểm tra cấu trúc folder có đúng không
-→ Phải có folder 1.60.1 bên trong
+→ Run Arena of Valor at least once to download resources
+→ Check in Filza: /var/mobile/Containers/Data/Application/
 ```
 
-**"Lỗi khi copy files"**
+**"Invalid mod pack"**
 ```
-→ Check permissions trong Filza
-→ Restart app và thử lại
+→ Verify folder structure
+→ Must contain 1.60.1 folder inside
 ```
 
----
+**"File copy error"**
+```
+→ Check permissions in Filza
+→ Restart app and try again
+→ Reinstall via TrollStore if entitlements not working
+```
 
-## 📸 Screenshots
-
-*(Add screenshots sau khi build)*
+**"No root access"**
+```
+→ App must be installed via TrollStore (not regular sideload)
+→ Update TrollStore to latest version
+→ Check iOS compatibility
+```
 
 ---
 
 ## 🔧 Development
 
-**Build từ source:**
+**Build from source:**
 ```bash
 # Clone repo
-git clone <repo-url>
-cd ModInstaller
+git clone https://github.com/duydat1412/mod-installer-ipa.git
+cd mod-installer-ipa/ModInstaller
 
-# Open in Xcode
-open ModInstaller.xcodeproj
+# Install XcodeGen (if needed)
+brew install xcodegen
+
+# Generate Xcode project
+xcodegen generate
 
 # Build
 xcodebuild -scheme ModInstaller -configuration Release
@@ -190,21 +241,24 @@ xcodebuild -scheme ModInstaller -configuration Release
 
 ### v1.0 (2025-12-16)
 - ✅ Initial release
-- ✅ Auto game finder
+- ✅ Auto game finder with root access
 - ✅ Mod pack scanner
 - ✅ Backup/restore system
-- ✅ Progress tracking
-- ✅ 6 folder mappings support
+- ✅ Real-time progress tracking
+- ✅ 6 folder mappings (167+ files)
+- ✅ Filza-like entitlements
 
 ---
 
-## ⚖️ Legal
+## ⚖️ Legal Disclaimer
 
 **Educational purposes only.**
 
-- ❌ Không unlock premium skins không sở hữu
-- ❌ Không vi phạm game ToS
-- ✅ Chỉ dùng cho custom content TỰ TẠO
+- ❌ Do NOT unlock premium skins you don't own
+- ❌ Do NOT violate game ToS intentionally  
+- ❌ Do NOT distribute modded content
+- ✅ Only for custom textures YOU created
+- ✅ Offline testing / personal use
 
 **Use at your own risk.**
 
@@ -212,9 +266,17 @@ xcodebuild -scheme ModInstaller -configuration Release
 
 ## 🙏 Credits
 
-- Mod pack analysis by: DAT
-- App developed by: GitHub Copilot
-- Inspired by: Mod community
+- Analysis & Development: [duydat1412](https://github.com/duydat1412)
+- Powered by: SwiftUI, TrollStore entitlements
+- Inspired by: iOS modding community
+
+---
+
+## 📞 Support
+
+- 🐛 **Issues:** [GitHub Issues](../../issues)
+- 💬 **Discussions:** [GitHub Discussions](../../discussions)
+- ⭐ **Star this repo** if you find it useful!
 
 ---
 
