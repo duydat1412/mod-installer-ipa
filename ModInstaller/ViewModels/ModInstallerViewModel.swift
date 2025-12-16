@@ -73,9 +73,9 @@ class ModInstallerViewModel: ObservableObject {
             // Copy folder
             try FileManager.default.copyItem(at: url, to: destination)
             
-            // Scan using detected structure
-            let scanURL = destination.appendingPathComponent(modPackURL.path.replacingOccurrences(of: url.path, with: ""))
-            scanModPackFolder(url: scanURL)
+            // Find and scan the actual mod pack location
+            let actualModRoot = findModPackRoot(in: destination)
+            scanModPackFolder(url: actualModRoot)
             
         } catch {
             showError(message: "Lỗi import mod pack: \(error.localizedDescription)")
@@ -141,33 +141,44 @@ class ModInstallerViewModel: ObservableObject {
     }
     
     func scanModPackFolder(url: URL) {
+        print("🔍 Scanning mod pack at: \(url.path)")
+        
         guard let modPack = installService.scanModPack(at: url) else {
-            showError(message: "Không thể đọc mod pack. Kiểm tra lại cấu trúc folder.")
+            showError(message: "Không thể đọc mod pack.\n\nKiểm tra:\n- Folder có đúng cấu trúc không?\n- Có chứa AssetRefs, Prefab_Characters, etc?")
             return
         }
+        
+        print("✅ Found mod pack: \(modPack.name) - \(modPack.fileCount) files")
         
         // Add to list if not exists
         if !modPacks.contains(where: { $0.folderPath == modPack.folderPath }) {
             modPacks.append(modPack)
-            statusMessage = "✅ Đã thêm mod: \(modPack.name)"
+            statusMessage = "✅ Đã thêm: \(modPack.name)\n📦 \(modPack.fileCount) files (\(modPack.sizeFormatted))"
+        } else {
+            statusMessage = "⚠️ Mod pack đã tồn tại"
         }
     }
     
     // MARK: - Backup
     
     func createBackup() {
+        guard gameFound else {
+            showError(message: "Chưa tìm thấy game. Vui lòng cài Liên Quân Mobile trước.")
+            return
+        }
+        
         Task { @MainActor in
-            statusMessage = "Đang tạo backup..."
+            statusMessage = "⏳ Đang tạo backup..."
             
             do {
                 try installService.backupOriginalFiles { message in
                     DispatchQueue.main.async {
-                        self.statusMessage = message
+                        self.statusMessage = "📦 " + message
                     }
                 }
-                statusMessage = "✅ Backup hoàn tất!"
+                statusMessage = "✅ Backup hoàn tất!\n\n⚠️ Lưu ý: Backup sẽ bị ghi đè nếu tạo lại."
             } catch {
-                showError(message: error.localizedDescription)
+                showError(message: "Lỗi tạo backup:\n\(error.localizedDescription)")
             }
         }
     }
@@ -176,12 +187,18 @@ class ModInstallerViewModel: ObservableObject {
     
     func installSelectedMod() {
         guard let modPack = selectedModPack else {
-            showError(message: "Vui lòng chọn mod pack")
+            showError(message: "⚠️ Vui lòng chọn mod pack từ danh sách")
+            return
+        }
+        
+        guard gameFound else {
+            showError(message: "❌ Chưa tìm thấy game")
             return
         }
         
         isInstalling = true
         installProgress = InstallProgress(totalFiles: modPack.fileCount)
+        statusMessage = "⏳ Đang cài đặt \(modPack.name)..."
         
         Task { @MainActor in
             do {
@@ -191,13 +208,22 @@ class ModInstallerViewModel: ObservableObject {
                         
                         if progress.isComplete {
                             self.isInstalling = false
-                            self.statusMessage = "✅ Cài đặt mod hoàn tất! Restart game để áp dụng."
+                            self.statusMessage = """
+                            ✅ Cài đặt thành công!
+                            
+                            📝 Bước tiếp theo:
+                            1. Tắt Liên Quân (force close)
+                            2. Mở lại game
+                            3. Kiểm tra skin mods
+                            
+                            💡 Nếu muốn gỡ: ấn Restore Backup
+                            """
                         }
                     }
                 }
             } catch {
                 isInstalling = false
-                showError(message: error.localizedDescription)
+                showError(message: "❌ Lỗi cài đặt:\n\(error.localizedDescription)")
             }
         }
     }
@@ -205,18 +231,27 @@ class ModInstallerViewModel: ObservableObject {
     // MARK: - Restore
     
     func restoreBackup() {
+        guard gameFound else {
+            showError(message: "Chưa tìm thấy game")
+            return
+        }
+        
         Task { @MainActor in
-            statusMessage = "Đang restore backup..."
+            statusMessage = "⏳ Đang restore backup..."
             
             do {
                 try installService.restoreBackup { message in
                     DispatchQueue.main.async {
-                        self.statusMessage = message
+                        self.statusMessage = "📦 " + message
                     }
                 }
-                statusMessage = "✅ Restore hoàn tất!"
+                statusMessage = """
+                ✅ Đã restore về bản gốc!
+                
+                📝 Restart game để áp dụng
+                """
             } catch {
-                showError(message: error.localizedDescription)
+                showError(message: "❌ Lỗi restore:\n\(error.localizedDescription)\n\n💡 Có thể chưa tạo backup?")
             }
         }
     }
