@@ -98,12 +98,25 @@ jobs:
         name: ModInstaller-IPA
         path: build/Build/Products/Release-iphoneos/ModInstaller.ipa
         retention-days: 30
+    
+    - name: Generate Version Tag
+      id: version
+      run: |
+        if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          # Use existing tag
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        else
+          # Auto-generate version from date and commit
+          VERSION="v1.0.$(date +%Y%m%d.%H%M%S)"
+          echo "tag=$VERSION" >> $GITHUB_OUTPUT
+        fi
         
     - name: Create Release
-      if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2
       with:
+        tag_name: ${{ steps.version.outputs.tag }}
         files: build/Build/Products/Release-iphoneos/ModInstaller.ipa
         generate_release_notes: true
         draft: false
         prerelease: false
+        name: "ModInstaller ${{ steps.version.outputs.tag }}"
