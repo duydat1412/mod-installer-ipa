@@ -33,15 +33,10 @@ Resources/
 
 ## 🚀 Cách cài đặt (.ipa)
 
-- **Cách 1 – TrollStore (khuyến nghị nếu iOS hỗ trợ):**
+- **– TrollStore (khuyến nghị nếu iOS hỗ trợ, còn không hỗ trợ thì phải chịu):**
   1. Tải file `.ipa` từ phần **Releases** hoặc artifact GitHub Actions  
   2. Chuyển `.ipa` vào iPhone (AirDrop / Files)  
   3. Mở **TrollStore** → nhấn `+` → chọn `.ipa` → Install
-
-- **Cách 2 – AltStore / Sideloadly (iOS 17–18, không TrollStore):**
-  1. Cài **AltStore** hoặc **Sideloadly** trên PC, đăng nhập **Apple ID phụ**  
-  2. Kết nối iPhone với PC, chọn file `.ipa` và bấm Install  
-  3. Với Apple ID miễn phí: app dùng tối đa **7 ngày**, hết hạn phải cắm máy sign lại
 
 ---
 
