@@ -23,9 +23,7 @@ jobs:
         
     - name: Create Xcode project
       run: |
-        cd ModInstaller
-        
-        # Create project structure
+        # Create project structure in root
         cat > project.yml << 'EOF'
         name: ModInstaller
         options:
@@ -54,16 +52,12 @@ jobs:
       run: brew install xcodegen
       
     - name: Generate Xcode project
-      run: |
-        cd ModInstaller
-        xcodegen generate
+      run: xcodegen generate
         
     - name: Build IPA (unsigned)
       run: |
         cd ModInstaller
         
-        # Build for device
-        xcodebuild \
           -project ModInstaller.xcodeproj \
           -scheme ModInstaller \
           -configuration Release \
@@ -77,20 +71,20 @@ jobs:
       run: |
         cd ModInstaller/build/Build/Products/Release-iphoneos
         mkdir -p Payload
-        cp -r ModInstaller.app Payload/
+        cp er.app Payload/
         zip -r ModInstaller.ipa Payload
         
     - name: Upload IPA
       uses: actions/upload-artifact@v4
       with:
         name: ModInstaller-IPA
-        path: ModInstaller/build/Build/Products/Release-iphoneos/ModInstaller.ipa
+        path: build/Build/Products/Release-iphoneos/ModInstaller.ipa
         retention-days: 30
         
     - name: Create Release (if tag)
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
       with:
-        files: ModInstaller/build/Build/Products/Release-iphoneos/ModInstaller.ipa
+        files: build/Build/Products/Release-iphoneos/ModInstaller.ipa
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
