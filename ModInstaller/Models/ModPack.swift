@@ -41,21 +41,21 @@ struct ModFileMapping {
         ModFileMapping(
             sourceFolder: "AssetRefs/Hero",
             targetFolder: "AssetRefs/Hero",
-            recursive: false
+            recursive: true
         ),
         
         // Prefab_Characters
         ModFileMapping(
             sourceFolder: "Prefab_Characters",
             targetFolder: "Prefab_Characters",
-            recursive: false
+            recursive: true
         ),
         
         // assetbundle
         ModFileMapping(
             sourceFolder: "assetbundle",
             targetFolder: "assetbundle",
-            recursive: false
+            recursive: true
         ),
         
         // Databin/Client
@@ -69,14 +69,14 @@ struct ModFileMapping {
         ModFileMapping(
             sourceFolder: "Ages/Prefab_Characters/Prefab_Hero",
             targetFolder: "Ages/Prefab_Characters/Prefab_Hero",
-            recursive: false
+            recursive: true
         ),
         
         // Languages/VN_Garena_VN
         ModFileMapping(
             sourceFolder: "Languages/VN_Garena_VN",
             targetFolder: "Languages/VN_Garena_VN",
-            recursive: false
+            recursive: true
         )
     ]
 }

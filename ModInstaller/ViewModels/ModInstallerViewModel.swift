@@ -5,7 +5,9 @@ import Combine
 
 @MainActor
 class ModInstallerViewModel: ObservableObject {
+    // Nếu sau này bạn muốn hỗ trợ nhiều mod, có thể dùng lại mảng này.
     @Published var modPacks: [ModPack] = []
+    // Mod hiện tại (mod vừa import gần nhất)
     @Published var selectedModPack: ModPack?
     @Published var installProgress = InstallProgress()
     @Published var isInstalling = false
@@ -158,13 +160,14 @@ class ModInstallerViewModel: ObservableObject {
         
         print("✅ Found mod pack: \(modPack.name) - \(modPack.fileCount) files")
         
-        // Add to list if not exists
-        if !modPacks.contains(where: { $0.folderPath == modPack.folderPath }) {
-            modPacks.append(modPack)
-            statusMessage = "✅ Đã thêm: \(modPack.name)\n📦 \(modPack.fileCount) files (\(modPack.sizeFormatted))"
-        } else {
-            statusMessage = "⚠️ Mod pack đã tồn tại"
-        }
+        // Lưu lại làm mod hiện tại
+        selectedModPack = modPack
+        
+        // Ghi lại status
+        statusMessage = "✅ Đã import: \(modPack.name)\n📦 \(modPack.fileCount) files (\(modPack.sizeFormatted))"
+        
+        // Tự động cài luôn mod vừa import
+        installSelectedMod()
     }
     
     // MARK: - Backup

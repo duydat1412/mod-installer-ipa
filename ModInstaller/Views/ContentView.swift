@@ -13,8 +13,8 @@ struct ContentView: View {
                 // Status
                 statusSection
                 
-                // Mod List - ✅ FIXED: Luôn hiển thị section này
-                modListSection
+                // Current mod info (không còn list chọn)
+                currentModSection
                 
                 // Actions
                 Spacer()
@@ -111,67 +111,37 @@ struct ContentView: View {
         .cornerRadius(10)
     }
     
-    // ✅ FIXED: Luôn hiển thị mod list section
-    private var modListSection: some View {
+    // Thông tin mod hiện tại (mod vừa import gần nhất)
+    private var currentModSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Mod Packs (\(viewModel.modPacks.count))")
+            Text("Mod hiện tại")
                 .font(.headline)
             
-            // Debug label to verify data source
-            if !viewModel.modPacks.isEmpty {
-                Text("Đang có \(viewModel.modPacks.count) mod pack trong bộ nhớ.")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
-            
-            if viewModel.modPacks.isEmpty {
-                // Empty state
-                VStack(spacing: 8) {
-                    Image(systemName: "archivebox")
-                        .font(.system(size: 40))
-                        .foregroundColor(.gray)
-                    Text("Chưa có mod pack")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text("Nhấn 'Thêm Mod Pack' để import")
+            if let mod = viewModel.selectedModPack {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(mod.name.isEmpty ? "(No name)" : mod.name)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    Text("Files: \(mod.fileCount) • Size: \(mod.sizeFormatted) • Author: \(mod.author)")
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
                 .background(Color.secondary.opacity(0.05))
                 .cornerRadius(10)
             } else {
-                // ✅ Mod pack cards (dùng LazyVStack để tránh layout lỗi)
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 12) {
-                        ForEach(viewModel.modPacks) { mod in
-                            VStack(alignment: .leading, spacing: 6) {
-                                // Fallback text-only row to make sure always visible
-                                Text(mod.name.isEmpty ? "(No name)" : mod.name)
-                                    .font(.headline)
-                                Text("Files: \(mod.fileCount) • Size: \(mod.sizeFormatted) • Author: \(mod.author)")
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                                
-                                ModPackRow(
-                                    modPack: mod,
-                                    isSelected: viewModel.selectedModPack?.id == mod.id
-                                )
-                            }
-                            .padding(10)
-                            .background(Color.secondary.opacity(0.08))
-                            .cornerRadius(12)
-                            .onTapGesture {
-                                withAnimation {
-                                    viewModel.selectedModPack = mod
-                                }
-                            }
-                        }
-                    }
-                    .padding(.vertical, 4)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Chưa import mod nào")
+                        .font(.subheadline)
+                    Text("Nhấn 'Thêm Mod Pack' để chọn file mod (.zip) và app sẽ tự cài.")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
                 }
-                .frame(maxHeight: 260)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+                .background(Color.secondary.opacity(0.05))
+                .cornerRadius(10)
             }
         }
     }
@@ -208,13 +178,8 @@ struct ContentView: View {
                 viewModel.installSelectedMod()
             }) {
                 HStack {
-                    if viewModel.selectedModPack == nil {
-                        Image(systemName: "hand.tap.fill")
-                        Text("Chọn mod pack để cài")
-                    } else {
-                        Image(systemName: "arrow.down.circle.fill")
-                        Text("Cài Đặt Mod")
-                    }
+                    Image(systemName: "arrow.down.circle.fill")
+                    Text("Cài lại mod hiện tại")
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
