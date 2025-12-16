@@ -135,21 +135,36 @@ struct ContentView: View {
                 .background(Color.secondary.opacity(0.05))
                 .cornerRadius(10)
             } else {
-                // ✅ Mod pack cards
+                // ✅ Mod pack cards (dùng LazyVStack để tránh layout lỗi)
                 ScrollView {
-                    ForEach(viewModel.modPacks) { mod in
-                        ModPackRow(
-                            modPack: mod,
-                            isSelected: viewModel.selectedModPack?.id == mod.id
-                        )
-                        .onTapGesture {
-                            withAnimation {
-                                viewModel.selectedModPack = mod
+                    LazyVStack(spacing: 12) {
+                        ForEach(viewModel.modPacks) { mod in
+                            ModPackRow(
+                                modPack: mod,
+                                isSelected: viewModel.selectedModPack?.id == mod.id
+                            )
+                            .onTapGesture {
+                                withAnimation {
+                                    viewModel.selectedModPack = mod
+                                }
                             }
+                            
+                            // Debug mini-label để đảm bảo vẫn thấy dữ liệu thô
+                            HStack {
+                                Circle()
+                                    .fill(Color.green)
+                                    .frame(width: 6, height: 6)
+                                Text("\(mod.name) • \(mod.fileCount) files • \(mod.sizeFormatted)")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                            }
+                            .padding(.horizontal, 4)
                         }
                     }
+                    .padding(.vertical, 4)
                 }
-                .frame(maxHeight: 200)
+                .frame(maxHeight: 240)
             }
         }
     }
