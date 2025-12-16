@@ -1,0 +1,91 @@
+═══════════════════════════════════════════════════════════
+    🚀 QUICK START - BUILD IPA IN 5 COMMANDS
+═══════════════════════════════════════════════════════════
+
+📋 Prerequisites:
+   ✅ Git installed
+   ✅ GitHub account
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 1: Initialize Git Repository
+═══════════════════════════════════════════════════════════
+
+cd C:\Users\DAT\Desktop\project\ModInstaller
+git init
+git add .
+git commit -m "Initial commit"
+
+
+STEP 2: Create GitHub Repo
+═══════════════════════════════════════════════════════════
+
+1. Go to: https://github.com/new
+2. Repository name: ModInstaller
+3. Visibility: Private
+4. Create repository
+
+
+STEP 3: Push to GitHub
+═══════════════════════════════════════════════════════════
+
+git remote add origin https://github.com/YOUR_USERNAME/ModInstaller.git
+git branch -M main
+git push -u origin main
+
+⚠️  Replace YOUR_USERNAME with your GitHub username!
+
+
+STEP 4: Wait for Build
+═══════════════════════════════════════════════════════════
+
+1. Go to: https://github.com/YOUR_USERNAME/ModInstaller/actions
+2. Wait for ✅ green checkmark (~5-10 minutes)
+
+
+STEP 5: Download IPA
+═══════════════════════════════════════════════════════════
+
+1. Click on the completed workflow run
+2. Scroll down to "Artifacts"
+3. Click "ModInstaller-IPA" to download
+4. Extract ZIP → You get ModInstaller.ipa
+
+
+STEP 6: Install on iPhone
+═══════════════════════════════════════════════════════════
+
+Method A - TrollStore:
+   1. Transfer IPA to iPhone (AirDrop/Files)
+   2. Open TrollStore
+   3. Tap "+" → Select IPA
+   4. Install → Done!
+
+Method B - Sideloadly:
+   1. Open Sideloadly on PC
+   2. Drag IPA file
+   3. Connect iPhone
+   4. Sign & install
+
+
+═══════════════════════════════════════════════════════════
+✅ DONE! Open ModInstaller app on your iPhone
+═══════════════════════════════════════════════════════════
+
+📖 Detailed guide: See SETUP.md
+🐛 Troubleshooting: See README.md
+🧪 Test logic: python test_mod_installer.py
+
+
+═══════════════════════════════════════════════════════════
+Future Updates:
+═══════════════════════════════════════════════════════════
+
+1. Edit code
+2. git add .
+3. git commit -m "Update description"
+4. git push
+5. GitHub auto-builds new IPA
+6. Download from Actions tab
+
+That's it! 🎉

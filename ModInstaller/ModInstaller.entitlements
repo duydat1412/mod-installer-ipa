@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Platform Application - Required for root access -->
+	<key>platform-application</key>
+	<true/>
+	
+	<!-- Disable Container Sandbox -->
+	<key>com.apple.private.security.no-container</key>
+	<true/>
+	
+	<!-- Access to all app containers -->
+	<key>com.apple.private.security.storage.AppDataContainers</key>
+	<true/>
+	
+	<!-- Container Manager - Like Filza -->
+	<key>com.apple.private.security.container-manager</key>
+	<true/>
+	
+	<!-- File system access -->
+	<key>com.apple.security.iokit-user-client-class</key>
+	<array>
+		<string>RootDomainUserClient</string>
+	</array>
+	
+	<!-- Task for others - Required for file operations -->
+	<key>task_for_pid-allow</key>
+	<true/>
+	
+	<!-- Get task allow -->
+	<key>get-task-allow</key>
+	<true/>
+	
+	<!-- Run unsigned code -->
+	<key>run-unsigned-code</key>
+	<true/>
+</dict>
+</plist>
