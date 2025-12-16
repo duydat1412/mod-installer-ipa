@@ -12,12 +12,18 @@ build/
 .swiftpm/
 .build/
 
-# Python
+# Python test files (không push)
 __pycache__/
 *.py[cod]
 *$py.class
 test_environment/
 *.log
+test_mod_installer.py
+
+# Documentation files (local only)
+QUICKSTART.txt
+SETUP.md
+ENTITLEMENTS_EXPLAINED.md
 
 # macOS
 .DS_Store
