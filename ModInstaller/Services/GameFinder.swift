@@ -35,7 +35,7 @@ class GameFinder {
                     // Additional verification - check for version folder
                     if let versions = try? fileManager.contentsOfDirectory(atPath: testPath),
                        versions.contains(where: { $0.contains("1.60") }) {
-                        return URL(fileURLPath: appPath)
+                        return URL(fileURLWithPath: appPath)
                     }
                 }
             }

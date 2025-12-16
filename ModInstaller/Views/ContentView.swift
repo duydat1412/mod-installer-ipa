@@ -31,10 +31,12 @@ struct ContentView: View {
             .padding()
             .navigationTitle("Mod Installer")
             .navigationBarTitleDisplayMode(.large)
-            .alert("Lỗi", isPresented: $viewModel.showError) {
-                Button("OK") { }
-            } message: {
-                Text(viewModel.errorMessage)
+            .alert(isPresented: $viewModel.showError) {
+                Alert(
+                    title: Text("Lỗi"),
+                    message: Text(viewModel.errorMessage),
+                    dismissButton: .default(Text("OK"))
+                )
             }
         }
     }

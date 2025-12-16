@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 import Combine
 
+@MainActor
 class ModInstallerViewModel: ObservableObject {
     @Published var modPacks: [ModPack] = []
     @Published var selectedModPack: ModPack?
