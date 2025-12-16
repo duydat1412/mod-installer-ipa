@@ -3,6 +3,8 @@ name: Build IPA
 on:
   push:
     branches: [ main, master ]
+    tags:
+      - 'v*'  # Trigger on version tags
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:  # Allow manual trigger
