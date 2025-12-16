@@ -29,6 +29,7 @@ class GameFinder {
             print("📱 Found \(apps.count) apps")
             
             for appUUID in apps {
+                // Support both UUID folders and named folders (e.g., "Liên Quân Mobile")
                 let appPath = "\(applicationDirectory)/\(appUUID)/Documents"
                 
                 // Check if this is the game by looking for specific files
