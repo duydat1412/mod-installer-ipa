@@ -117,6 +117,13 @@ struct ContentView: View {
             Text("Mod Packs (\(viewModel.modPacks.count))")
                 .font(.headline)
             
+            // Debug label to verify data source
+            if !viewModel.modPacks.isEmpty {
+                Text("Đang có \(viewModel.modPacks.count) mod pack trong bộ nhớ.")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
             if viewModel.modPacks.isEmpty {
                 // Empty state
                 VStack(spacing: 8) {
@@ -137,34 +144,34 @@ struct ContentView: View {
             } else {
                 // ✅ Mod pack cards (dùng LazyVStack để tránh layout lỗi)
                 ScrollView {
-                    LazyVStack(spacing: 12) {
+                    LazyVStack(alignment: .leading, spacing: 12) {
                         ForEach(viewModel.modPacks) { mod in
-                            ModPackRow(
-                                modPack: mod,
-                                isSelected: viewModel.selectedModPack?.id == mod.id
-                            )
+                            VStack(alignment: .leading, spacing: 6) {
+                                // Fallback text-only row to make sure always visible
+                                Text(mod.name.isEmpty ? "(No name)" : mod.name)
+                                    .font(.headline)
+                                Text("Files: \(mod.fileCount) • Size: \(mod.sizeFormatted) • Author: \(mod.author)")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                                
+                                ModPackRow(
+                                    modPack: mod,
+                                    isSelected: viewModel.selectedModPack?.id == mod.id
+                                )
+                            }
+                            .padding(10)
+                            .background(Color.secondary.opacity(0.08))
+                            .cornerRadius(12)
                             .onTapGesture {
                                 withAnimation {
                                     viewModel.selectedModPack = mod
                                 }
                             }
-                            
-                            // Debug mini-label để đảm bảo vẫn thấy dữ liệu thô
-                            HStack {
-                                Circle()
-                                    .fill(Color.green)
-                                    .frame(width: 6, height: 6)
-                                Text("\(mod.name) • \(mod.fileCount) files • \(mod.sizeFormatted)")
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(1)
-                            }
-                            .padding(.horizontal, 4)
                         }
                     }
                     .padding(.vertical, 4)
                 }
-                .frame(maxHeight: 240)
+                .frame(maxHeight: 260)
             }
         }
     }
