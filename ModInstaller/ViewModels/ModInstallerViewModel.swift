@@ -43,6 +43,41 @@ class ModInstallerViewModel: ObservableObject {
     
     // MARK: - Scan Mod Pack
     
+    func importModPack(from url: URL) {
+        // Copy mod pack to app's Documents folder for permanent access
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let modPacksFolder = documentsURL.appendingPathComponent("ModPacks")
+        
+        do {
+            // Create ModPacks folder if needed
+            try FileManager.default.createDirectory(at: modPacksFolder, withIntermediateDirectories: true)
+            
+            // Destination path
+            let destination = modPacksFolder.appendingPathComponent(url.lastPathComponent)
+            
+            // Remove if exists
+            if FileManager.default.fileExists(atPath: destination.path) {
+                try FileManager.default.removeItem(at: destination)
+            }
+            
+            // Handle ZIP files
+            if url.pathExtension.lowercased() == "zip" {
+                // TODO: Unzip implementation
+                statusMessage = "⚠️ ZIP support coming soon! Vui lòng extract trước rồi chọn folder."
+                return
+            }
+            
+            // Copy folder
+            try FileManager.default.copyItem(at: url, to: destination)
+            
+            // Scan mod pack
+            scanModPackFolder(url: destination)
+            
+        } catch {
+            showError(message: "Lỗi import mod pack: \(error.localizedDescription)")
+        }
+    }
+    
     func scanModPackFolder(url: URL) {
         guard let modPack = installService.scanModPack(at: url) else {
             showError(message: "Không thể đọc mod pack. Kiểm tra lại cấu trúc folder.")

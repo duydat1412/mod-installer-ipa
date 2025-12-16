@@ -31,6 +31,13 @@ struct ContentView: View {
             .padding()
             .navigationTitle("Mod Installer")
             .navigationBarTitleDisplayMode(.large)
+            .fileImporter(
+                isPresented: $showDocumentPicker,
+                allowedContentTypes: [.folder, .zip],
+                allowsMultipleSelection: false
+            ) { result in
+                handleModPackImport(result: result)
+            }
             .alert(isPresented: $viewModel.showError) {
                 Alert(
                     title: Text("Lỗi"),
@@ -217,6 +224,31 @@ struct ModPackRow: View {
         .padding()
         .background(isSelected ? Color.blue.opacity(0.1) : Color.secondary.opacity(0.05))
         .cornerRadius(10)
+    }
+    
+    // MARK: - Helper Functions
+    
+    private func handleModPackImport(result: Result<[URL], Error>) {
+        do {
+            let urls = try result.get()
+            guard let url = urls.first else { return }
+            
+            // Start accessing security-scoped resource
+            guard url.startAccessingSecurityScopedResource() else {
+                viewModel.errorMessage = "Không thể truy cập file/folder"
+                viewModel.showError = true
+                return
+            }
+            
+            defer { url.stopAccessingSecurityScopedResource() }
+            
+            // Import mod pack
+            viewModel.importModPack(from: url)
+            
+        } catch {
+            viewModel.errorMessage = "Lỗi chọn mod pack: \(error.localizedDescription)"
+            viewModel.showError = true
+        }
     }
 }
 
