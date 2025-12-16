@@ -56,6 +56,11 @@ struct ContentView: View {
             Text("Auto install skin mods")
                 .font(.caption)
                 .foregroundColor(.secondary)
+            
+            Text("by duydat1412")
+                .font(.caption2)
+                .foregroundColor(.blue)
+                .padding(.top, 4)
         }
         .padding()
     }

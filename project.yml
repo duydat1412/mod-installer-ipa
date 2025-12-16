@@ -1,0 +1,19 @@
+name: ModInstaller
+options:
+  bundleIdPrefix: com.duydat1412
+  deploymentTarget:
+    iOS: 14.0
+targets:
+  ModInstaller:
+    type: application
+    platform: iOS
+    sources:
+      - ModInstaller
+    settings:
+      base:
+        INFOPLIST_FILE: ModInstaller/Info.plist
+        CODE_SIGN_ENTITLEMENTS: ModInstaller/ModInstaller.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        PRODUCT_BUNDLE_IDENTIFIER: com.duydat1412.ModInstaller
+        MARKETING_VERSION: 1.0.0
+        CURRENT_PROJECT_VERSION: 1

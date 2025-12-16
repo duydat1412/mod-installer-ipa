@@ -22,8 +22,11 @@ class GameFinder {
             return nil
         }
         
+        print("🔍 Searching for game in: \(applicationDirectory)")
+        
         do {
             let apps = try fileManager.contentsOfDirectory(atPath: applicationDirectory)
+            print("📱 Found \(apps.count) apps")
             
             for appUUID in apps {
                 let appPath = "\(applicationDirectory)/\(appUUID)/Documents"
@@ -32,10 +35,17 @@ class GameFinder {
                 let testPath = "\(appPath)/Resources"
                 
                 if fileManager.fileExists(atPath: testPath) {
-                    // Additional verification - check for version folder
-                    if let versions = try? fileManager.contentsOfDirectory(atPath: testPath),
-                       versions.contains(where: { $0.contains("1.60") }) {
-                        return URL(fileURLWithPath: appPath)
+                    print("✅ Found Resources folder: \(testPath)")
+                    
+                    // Check for ANY version folder (not just 1.60)
+                    if let versions = try? fileManager.contentsOfDirectory(atPath: testPath) {
+                        print("📂 Versions found: \(versions)")
+                        
+                        // Look for version folders (e.g., 1.60.1, 1.61.2, etc.)
+                        if versions.contains(where: { $0.range(of: "^\\d+\\.\\d+", options: .regularExpression) != nil }) {
+                            print("🎮 Game found at: \(appPath)")
+                            return URL(fileURLWithPath: appPath)
+                        }
                     }
                 }
             }
@@ -43,6 +53,7 @@ class GameFinder {
             print("❌ Error searching for game: \(error)")
         }
         
+        print("❌ Game not found")
         return nil
     }
     
@@ -60,13 +71,40 @@ class GameFinder {
     }
     
     // Get specific version folder (e.g., 1.60.1)
-    func getVersionDirectory(version: String = "1.60.1") -> URL? {
+    func getVersionDirectory(version: String? = nil) -> URL? {
         guard let resourcesDir = getResourcesDirectory() else { return nil }
         
-        let versionPath = resourcesDir.appendingPathComponent(version)
+        // If specific version provided, try that first
+        if let version = version {
+            let versionPath = resourcesDir.appendingPathComponent(version)
+            if FileManager.default.fileExists(atPath: versionPath.path) {
+                return versionPath
+            }
+        }
         
-        if FileManager.default.fileExists(atPath: versionPath.path) {
-            return versionPath
+        // Otherwise, find ANY version folder automatically
+        do {
+            let contents = try FileManager.default.contentsOfDirectory(atPath: resourcesDir.path)
+            
+            // Look for folders matching version pattern (e.g., 1.60.1, 1.61.2)
+            for folder in contents {
+                if folder.range(of: "^\\d+\\.\\d+\\.\\d+$", options: .regularExpression) != nil {
+                    let versionPath = resourcesDir.appendingPathComponent(folder)
+                    print("🎯 Auto-detected version: \(folder)")
+                    return versionPath
+                }
+            }
+            
+            // Fallback: Try 2-part versions (e.g., 1.60)
+            for folder in contents {
+                if folder.range(of: "^\\d+\\.\\d+$", options: .regularExpression) != nil {
+                    let versionPath = resourcesDir.appendingPathComponent(folder)
+                    print("🎯 Auto-detected version: \(folder)")
+                    return versionPath
+                }
+            }
+        } catch {
+            print("❌ Error reading Resources folder: \(error)")
         }
         
         return nil

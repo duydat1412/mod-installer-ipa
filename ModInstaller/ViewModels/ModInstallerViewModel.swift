@@ -23,12 +23,21 @@ class ModInstallerViewModel: ObservableObject {
     // MARK: - Check Game
     
     func checkGameInstallation() {
+        // Check root access first
+        let hasRootAccess = gameFinder.checkRootAccess()
+        
+        if !hasRootAccess {
+            gameFound = false
+            statusMessage = "❌ Không có quyền truy cập root\n\n⚠️ App cần cài qua TrollStore để có quyền đặc biệt"
+            return
+        }
+        
         if let gameDir = gameFinder.getVersionDirectory() {
             gameFound = true
             statusMessage = "✅ Đã tìm thấy game tại: \(gameDir.path)"
         } else {
             gameFound = false
-            statusMessage = "❌ Không tìm thấy Liên Quân Mobile"
+            statusMessage = "❌ Không tìm thấy Liên Quân Mobile\n\nKiểm tra:\n1. Game đã cài chưa?\n2. App được cài qua TrollStore?\n3. Xem Console logs để debug"
         }
     }
     
