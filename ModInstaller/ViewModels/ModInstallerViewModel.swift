@@ -52,6 +52,16 @@ class ModInstallerViewModel: ObservableObject {
             // Create ModPacks folder if needed
             try FileManager.default.createDirectory(at: modPacksFolder, withIntermediateDirectories: true)
             
+            // Handle ZIP files
+            if url.pathExtension.lowercased() == "zip" {
+                // TODO: Unzip implementation
+                statusMessage = "⚠️ ZIP support coming soon! Vui lòng extract trước rồi chọn folder."
+                return
+            }
+            
+            // Auto-detect mod pack structure
+            let modPackURL = findModPackRoot(in: url)
+            
             // Destination path
             let destination = modPacksFolder.appendingPathComponent(url.lastPathComponent)
             
@@ -60,22 +70,74 @@ class ModInstallerViewModel: ObservableObject {
                 try FileManager.default.removeItem(at: destination)
             }
             
-            // Handle ZIP files
-            if url.pathExtension.lowercased() == "zip" {
-                // TODO: Unzip implementation
-                statusMessage = "⚠️ ZIP support coming soon! Vui lòng extract trước rồi chọn folder."
-                return
-            }
-            
             // Copy folder
             try FileManager.default.copyItem(at: url, to: destination)
             
-            // Scan mod pack
-            scanModPackFolder(url: destination)
+            // Scan using detected structure
+            let scanURL = destination.appendingPathComponent(modPackURL.path.replacingOccurrences(of: url.path, with: ""))
+            scanModPackFolder(url: scanURL)
             
         } catch {
             showError(message: "Lỗi import mod pack: \(error.localizedDescription)")
         }
+    }
+    
+    /// Auto-detect mod pack root folder (Resources/1.60.x/)
+    private func findModPackRoot(in folder: URL) -> URL {
+        let fm = FileManager.default
+        
+        // Check if current folder already has mod files
+        if hasModFiles(at: folder) {
+            print("✅ Found mod files at root: \(folder.path)")
+            return folder
+        }
+        
+        // Look for Resources folder
+        let resourcesURL = folder.appendingPathComponent("Resources")
+        if fm.fileExists(atPath: resourcesURL.path) {
+            // Look for version folders (1.60.1, 1.61.2, etc.)
+            if let contents = try? fm.contentsOfDirectory(atPath: resourcesURL.path) {
+                for item in contents {
+                    if item.range(of: "^\\d+\\.\\d+", options: .regularExpression) != nil {
+                        let versionURL = resourcesURL.appendingPathComponent(item)
+                        if hasModFiles(at: versionURL) {
+                            print("✅ Found mod files at: \(versionURL.path)")
+                            return versionURL
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Fallback: recursively search
+        if let enumerator = fm.enumerator(at: folder, includingPropertiesForKeys: nil) {
+            for case let fileURL as URL in enumerator {
+                if hasModFiles(at: fileURL) {
+                    print("✅ Found mod files at: \(fileURL.path)")
+                    return fileURL
+                }
+            }
+        }
+        
+        print("⚠️ No mod files detected, using root folder: \(folder.path)")
+        return folder
+    }
+    
+    /// Check if folder contains mod files (AssetRefs, Prefab_Characters, etc.)
+    private func hasModFiles(at folder: URL) -> Bool {
+        let fm = FileManager.default
+        let expectedFolders = ["AssetRefs", "Prefab_Characters", "assetbundle", "Databin", "Ages", "Languages"]
+        
+        var count = 0
+        for folderName in expectedFolders {
+            let path = folder.appendingPathComponent(folderName).path
+            if fm.fileExists(atPath: path) {
+                count += 1
+            }
+        }
+        
+        // Consider it a mod pack if at least 2 expected folders exist
+        return count >= 2
     }
     
     func scanModPackFolder(url: URL) {
