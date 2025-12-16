@@ -53,24 +53,18 @@ class ModInstallerViewModel: ObservableObject {
             try FileManager.default.createDirectory(at: modPacksFolder, withIntermediateDirectories: true)
 
             if url.pathExtension.lowercased() == "zip" {
-                // Tạo thư mục tạm cho modpack giải nén
+                // ✅ FIXED: Dùng API mới của ZIPFoundation 0.9.19+
                 let unzipFolderName = url.deletingPathExtension().lastPathComponent + "_unzipped"
                 let unzipFolder = modPacksFolder.appendingPathComponent(unzipFolderName)
+                
                 // Xóa nếu đã tồn tại
                 if FileManager.default.fileExists(atPath: unzipFolder.path) {
                     try FileManager.default.removeItem(at: unzipFolder)
                 }
-                // Giải nén
-                guard let archive = Archive(url: url, accessMode: .read) else {
-                    showError(message: "Không thể đọc file zip!")
-                    return
-                }
-                do {
-                    try archive.extract(to: unzipFolder)
-                } catch {
-                    showError(message: "Lỗi giải nén: \(error.localizedDescription)")
-                    return
-                }
+                
+                // ✅ Dùng FileManager extension từ ZIPFoundation
+                try FileManager.default.unzipItem(at: url, to: unzipFolder)
+                
                 // Tìm và scan modpack như folder bình thường
                 let actualModRoot = findModPackRoot(in: unzipFolder)
                 scanModPackFolder(url: actualModRoot)
