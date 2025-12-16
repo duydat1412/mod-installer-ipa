@@ -27,6 +27,9 @@ struct ContentView: View {
                 if viewModel.isInstalling {
                     progressSection
                 }
+                
+                // Footer credits
+                creditsFooter
             }
             .padding()
             .navigationTitle("Mod Installer")
@@ -64,10 +67,27 @@ struct ContentView: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
             
-            Text("by duydat1412")
-                .font(.caption2)
+            // Credits button
+            Button(action: {
+                if let url = URL(string: "https://github.com/duydat1412") {
+                    UIApplication.shared.open(url)
+                }
+            }) {
+                HStack(spacing: 4) {
+                    Image(systemName: "person.circle.fill")
+                        .font(.caption2)
+                    Text("by duydat1412")
+                        .font(.caption2)
+                    Image(systemName: "arrow.up.right.square.fill")
+                        .font(.system(size: 10))
+                }
                 .foregroundColor(.blue)
-                .padding(.top, 4)
+                .padding(.vertical, 6)
+                .padding(.horizontal, 12)
+                .background(Color.blue.opacity(0.1))
+                .cornerRadius(8)
+            }
+            .padding(.top, 4)
         }
         .padding()
     }
@@ -187,6 +207,61 @@ struct ContentView: View {
         .background(Color.secondary.opacity(0.1))
         .cornerRadius(10)
     }
+    
+    private var creditsFooter: some View {
+        VStack(spacing: 8) {
+            Divider()
+            
+            HStack(spacing: 16) {
+                // GitHub repo
+                Button(action: {
+                    if let url = URL(string: "https://github.com/duydat1412/mod-installer-ipa") {
+                        UIApplication.shared.open(url)
+                    }
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left.forwardslash.chevron.right")
+                            .font(.caption)
+                        Text("Source Code")
+                            .font(.caption2)
+                    }
+                    .foregroundColor(.blue)
+                }
+                
+                Text("•")
+                    .foregroundColor(.secondary)
+                    .font(.caption2)
+                
+                // Profile
+                Button(action: {
+                    if let url = URL(string: "https://github.com/duydat1412") {
+                        UIApplication.shared.open(url)
+                    }
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "person.circle")
+                            .font(.caption)
+                        Text("@duydat1412")
+                            .font(.caption2)
+                    }
+                    .foregroundColor(.blue)
+                }
+                
+                Text("•")
+                    .foregroundColor(.secondary)
+                    .font(.caption2)
+                
+                Text("v1.0.3")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            Text("Made with ❤️ for Liên Quân community")
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
+        }
+        .padding(.vertical, 8)
+    }
 }
 
 // MARK: - Mod Pack Row
@@ -225,7 +300,11 @@ struct ModPackRow: View {
         .background(isSelected ? Color.blue.opacity(0.1) : Color.secondary.opacity(0.05))
         .cornerRadius(10)
     }
-    
+}
+
+// MARK: - ContentView Extension
+
+extension ContentView {
     // MARK: - Helper Functions
     
     private func handleModPackImport(result: Result<[URL], Error>) {

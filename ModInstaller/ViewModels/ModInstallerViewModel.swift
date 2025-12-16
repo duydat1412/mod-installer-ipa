@@ -60,7 +60,7 @@ class ModInstallerViewModel: ObservableObject {
             }
             
             // Auto-detect mod pack structure
-            let modPackURL = findModPackRoot(in: url)
+            _ = findModPackRoot(in: url)
             
             // Destination path
             let destination = modPacksFolder.appendingPathComponent(url.lastPathComponent)
