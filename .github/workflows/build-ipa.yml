@@ -4,10 +4,10 @@ on:
   push:
     branches: [ main, master ]
     tags:
-      - 'v*'  # Trigger on version tags
+      - 'v*'
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
     runs-on: macos-latest
     
     permissions:
-      contents: write  # Required for creating releases
+      contents: write
     
     steps:
     - name: Checkout code
@@ -25,39 +25,19 @@ jobs:
       uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: latest-stable
-        
-    - name: Create Xcode project
-      run: |
-        # Create project structure in root
-        cat > project.yml << 'EOF'
-        name: ModInstaller
-        options:
-          bundleIdPrefix: com.modinstaller
-          deploymentTarget:
-            iOS: 14.0
-        targets:
-          ModInstaller:
-            type: application
-            platform: iOS
-            deploymentTarget: 14.0
-            sources:
-              - ModInstaller
-            settings:
-              base:
-                PRODUCT_BUNDLE_IDENTIFIER: com.modinstaller.lqm
-                INFOPLIST_FILE: ModInstaller/Info.plist
-                CODE_SIGN_ENTITLEMENTS: ModInstaller/ModInstaller.entitlements
-                DEVELOPMENT_TEAM: ""
-                CODE_SIGN_IDENTITY: "-"
-                CODE_SIGN_STYLE: Manual
-                PROVISIONING_PROFILE_SPECIFIER: ""
-        EOF
-        
+    
     - name: Install XcodeGen
       run: brew install xcodegen
       
     - name: Generate Xcode project
       run: xcodegen generate
+    
+    - name: Resolve Swift Package Dependencies
+      run: |
+        xcodebuild -resolvePackageDependencies \
+          -project ModInstaller.xcodeproj \
+          -scheme ModInstaller
+        echo "✅ Resolved ZIPFoundation 0.9.19"
         
     - name: Build IPA (unsigned)
       run: |
@@ -71,17 +51,12 @@ jobs:
           CODE_SIGNING_ALLOWED=NO
     
     - name: Install ldid for fake-signing
-      run: |
-        brew install ldid
+      run: brew install ldid
           
     - name: Sign with Entitlements using ldid
       run: |
         cd build/Build/Products/Release-iphoneos
-        
-        # Fake-sign binary with entitlements using ldid
         ldid -S../../../../ModInstaller/ModInstaller.entitlements ModInstaller.app/ModInstaller
-        
-        # Verify signature
         echo "📋 Verifying ldid signature:"
         ldid -e ModInstaller.app/ModInstaller || echo "⚠️ Cannot extract entitlements!"
           
@@ -103,10 +78,8 @@ jobs:
       id: version
       run: |
         if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-          # Use existing tag
           echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
         else
-          # Auto-generate version from date and commit
           VERSION="v1.0.$(date +%Y%m%d.%H%M%S)"
           echo "tag=$VERSION" >> $GITHUB_OUTPUT
         fi
