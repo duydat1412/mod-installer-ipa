@@ -69,21 +69,21 @@ jobs:
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
+    
+    - name: Install ldid for fake-signing
+      run: |
+        brew install ldid
           
-    - name: Embed Entitlements into IPA
+    - name: Sign with Entitlements using ldid
       run: |
         cd build/Build/Products/Release-iphoneos
         
-        # Copy entitlements file into app bundle
-        cp -f ../../../../ModInstaller/ModInstaller.entitlements ModInstaller.app/
+        # Fake-sign binary with entitlements using ldid
+        ldid -S../../../../ModInstaller/ModInstaller.entitlements ModInstaller.app/ModInstaller
         
-        # Verify entitlements are there
-        echo "📋 Verifying entitlements file:"
-        ls -lh ModInstaller.app/*.entitlements || echo "⚠️ Entitlements not found!"
-        
-        # Show entitlements content
-        echo "📄 Entitlements content:"
-        cat ModInstaller.app/ModInstaller.entitlements || echo "⚠️ Cannot read entitlements!"
+        # Verify signature
+        echo "📋 Verifying ldid signature:"
+        ldid -e ModInstaller.app/ModInstaller || echo "⚠️ Cannot extract entitlements!"
           
     - name: Create IPA
       run: |
