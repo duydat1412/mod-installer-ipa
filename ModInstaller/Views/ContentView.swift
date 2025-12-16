@@ -36,7 +36,7 @@ struct ContentView: View {
             .navigationBarTitleDisplayMode(.large)
             .fileImporter(
                 isPresented: $showDocumentPicker,
-                allowedContentTypes: [.folder, .zip],
+                allowedContentTypes: [.zip],
                 allowsMultipleSelection: false
             ) { result in
                 handleModPackImport(result: result)

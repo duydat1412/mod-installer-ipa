@@ -1,4 +1,5 @@
 import Foundation
+import ZIPFoundation
 import SwiftUI
 import Combine
 
@@ -47,36 +48,49 @@ class ModInstallerViewModel: ObservableObject {
         // Copy mod pack to app's Documents folder for permanent access
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let modPacksFolder = documentsURL.appendingPathComponent("ModPacks")
-        
         do {
             // Create ModPacks folder if needed
             try FileManager.default.createDirectory(at: modPacksFolder, withIntermediateDirectories: true)
-            
-            // Handle ZIP files
+
             if url.pathExtension.lowercased() == "zip" {
-                // TODO: Unzip implementation
-                statusMessage = "⚠️ ZIP support coming soon! Vui lòng extract trước rồi chọn folder."
+                // Tạo thư mục tạm cho modpack giải nén
+                let unzipFolderName = url.deletingPathExtension().lastPathComponent + "_unzipped"
+                let unzipFolder = modPacksFolder.appendingPathComponent(unzipFolderName)
+                // Xóa nếu đã tồn tại
+                if FileManager.default.fileExists(atPath: unzipFolder.path) {
+                    try FileManager.default.removeItem(at: unzipFolder)
+                }
+                // Giải nén
+                guard let archive = Archive(url: url, accessMode: .read) else {
+                    showError(message: "Không thể đọc file zip!")
+                    return
+                }
+                do {
+                    try archive.extract(to: unzipFolder)
+                } catch {
+                    showError(message: "Lỗi giải nén: \(error.localizedDescription)")
+                    return
+                }
+                // Tìm và scan modpack như folder bình thường
+                let actualModRoot = findModPackRoot(in: unzipFolder)
+                scanModPackFolder(url: actualModRoot)
+                statusMessage = "✅ Đã giải nén và import mod pack thành công!"
                 return
             }
-            
-            // Auto-detect mod pack structure
+
+            // Auto-detect mod pack structure (nếu là folder)
             _ = findModPackRoot(in: url)
-            
             // Destination path
             let destination = modPacksFolder.appendingPathComponent(url.lastPathComponent)
-            
             // Remove if exists
             if FileManager.default.fileExists(atPath: destination.path) {
                 try FileManager.default.removeItem(at: destination)
             }
-            
             // Copy folder
             try FileManager.default.copyItem(at: url, to: destination)
-            
             // Find and scan the actual mod pack location
             let actualModRoot = findModPackRoot(in: destination)
             scanModPackFolder(url: actualModRoot)
-            
         } catch {
             showError(message: "Lỗi import mod pack: \(error.localizedDescription)")
         }
