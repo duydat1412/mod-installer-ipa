@@ -24,6 +24,11 @@ test_mod_installer.py
 QUICKSTART.txt
 SETUP.md
 ENTITLEMENTS_EXPLAINED.md
+WINDOWS_DEVELOPMENT.md
+LIVE_TESTING_GUIDE.md
+BUILD_LOCAL.md
+*.txt
+*.log
 
 # macOS
 .DS_Store
