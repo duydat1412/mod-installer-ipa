@@ -28,9 +28,12 @@ class ModInstallService {
         let name = url.lastPathComponent
         let author = extractAuthor(from: url) ?? "Unknown"
         
+        // Extract version from mod folder name (e.g., "1.60.1", "1.61.2")
+        let detectedVersion = modRootURL.lastPathComponent
+        
         return ModPack(
             name: name,
-            version: "1.60.1",
+            version: detectedVersion,
             author: author,
             folderPath: modRootURL,
             fileCount: fileCount,
@@ -41,8 +44,11 @@ class ModInstallService {
     private func findVersionFolder(in url: URL) -> URL? {
         let fileManager = FileManager.default
         
-        // Check direct
-        if url.lastPathComponent.contains("1.60") {
+        // Version pattern: matches X.Y or X.Y.Z (e.g., 1.60, 1.61.2, 2.0.1)
+        let versionPattern = "^\\d+\\.\\d+(\\.\\d+)?$"
+        
+        // Check if current folder is a version folder
+        if url.lastPathComponent.range(of: versionPattern, options: .regularExpression) != nil {
             return url
         }
         
@@ -51,11 +57,12 @@ class ModInstallService {
             let contents = try fileManager.contentsOfDirectory(at: url, includingPropertiesForKeys: nil)
             
             for item in contents {
-                if item.lastPathComponent.contains("1.60") {
+                // Check if this item matches version pattern
+                if item.lastPathComponent.range(of: versionPattern, options: .regularExpression) != nil {
                     return item
                 }
                 
-                // Check one level deeper
+                // Check one level deeper (for Resources/X.Y.Z structure)
                 if item.hasDirectoryPath {
                     if let found = findVersionFolder(in: item) {
                         return found
